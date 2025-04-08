@@ -1,146 +1,169 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Drawer from "@mui/material/Drawer";
-import CssBaseline from "@mui/material/CssBaseline";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemButton from "@mui/material/ListItemButton";
-import { ThemeProvider } from "@emotion/react";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import { customTheme } from "./them/customeThem";
-import AdminNavbar from "./Navigation/AdminNavbar";
+import React, { useState } from "react";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
+import {
+  HomeIcon,
+  ShoppingBagIcon,
+  UserGroupIcon,
+  ClipboardDocumentListIcon,
+  CurrencyDollarIcon,
+  ChartBarIcon,
+  CalendarIcon,
+  PlusCircleIcon,
+  UserCircleIcon,
+  QuestionMarkCircleIcon,
+} from '@heroicons/react/24/outline';
 import Dashboard from "./Views/Admin";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import DemoAdmin from "./Views/DemoAdmin";
 import CreateProductForm from "./componets/createProduct/CreateProductFrom";
-
-import "./AdminPannel.css";
 import ProductsTable from "./componets/Products/ProductsTable";
 import OrdersTable from "./componets/Orders/OrdersTable";
 import Customers from "./componets/customers/customers";
 import UpdateProductForm from "./componets/updateProduct/UpdateProduct";
 
-const drawerWidth = 240;
-
 const menu = [
-  {name:"Dashboard",path:"/admin"},
-  {name:"Products",path:"/admin/products"},
-  {name:"Customers",path:"/admin/customers"},
-  {name:"Orders",path:"/admin/orders"},
-  {name:"Total Earnings",path:"/admin"},
-  {name:"Weekly Overview",path:"/admin"},
-  {name:"Monthly Overview",path:"/admin"},
-  {name:"Add Product",path:"/admin/product/create"},
+  { name: "Dashboard", path: "/admin", icon: HomeIcon },
+  { name: "Products", path: "/admin/products", icon: ShoppingBagIcon },
+  { name: "Customers", path: "/admin/customers", icon: UserGroupIcon },
+  { name: "Orders", path: "/admin/orders", icon: ClipboardDocumentListIcon },
+  { name: "Total Earnings", path: "/admin/earnings", icon: CurrencyDollarIcon },
+  { name: "Weekly Overview", path: "/admin/weekly", icon: ChartBarIcon },
+  { name: "Monthly Overview", path: "/admin/monthly", icon: CalendarIcon },
+  { name: "Add Product", path: "/admin/product/create", icon: PlusCircleIcon },
+];
+
+const bottomMenu = [
+  { name: "Account", path: "/admin/account", icon: UserCircleIcon },
+  { name: "Help", path: "/admin/help", icon: QuestionMarkCircleIcon },
 ];
 
 export default function AdminPannel() {
-  const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up("lg"));
-  const [sideBarVisible, setSideBarVisible] = React.useState(false);
-  const navigate=useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const drawer = (
-    <Box
-      sx={{
-        overflow: "auto",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}
-    >
-      {isLargeScreen && <Toolbar />}
-      <List>
-        {menu.map((item, index) => (
-          <ListItem key={item.name} disablePadding onClick={()=>navigate(item.path)}>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={item.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
-      <List sx={{ position: "absolute", bottom: 0, width: "100%" }}>
-        <Divider />
-        {["Account", "Request"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
-
-  const handleSideBarViewInMobile = () => {
-    setSideBarVisible(true);
+  const isActive = (path) => {
+    return location.pathname === path;
   };
-
-  const handleCloseSideBar = () => {
-    setSideBarVisible(false);
-  };
-
-  const drawerVariant = isLargeScreen ? "permanent" : "temporary";
 
   return (
-    <ThemeProvider theme={customTheme}>
-      <Box sx={{ display: `${isLargeScreen ? "flex" : "block"}` }}>
-        <CssBaseline />
-        <AdminNavbar handleSideBarViewInMobile={handleSideBarViewInMobile} />
+    <div className="min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-200 ease-in-out`}>
+        <div className="flex flex-col h-full">
+          {/* Logo */}
+          <div className="flex items-center justify-center h-16 px-4 border-b">
+            <h1 className="text-xl font-bold text-indigo-600">Admin Panel</h1>
+          </div>
 
-        <Drawer
-          variant={drawerVariant}
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: {
-              width: drawerWidth,
-              boxSizing: "border-box",
-              ...(drawerVariant === "temporary" && {
-                top: 0,
-                [`& .MuiPaper-root.MuiDrawer-paperAnchorTop.MuiDrawer-paperTemporary`]:
-                  {
-                    position: "fixed",
-                    left: 0,
-                    right: 0,
-                    height: "100%",
-                    zIndex: (theme) => theme.zIndex.drawer + 2,
-                  },
-              }),
-            },
-          }}
-          open={isLargeScreen || sideBarVisible}
-          onClose={handleCloseSideBar}
-        >
-          {drawer}
-        </Drawer>
-        <Box className="adminContainer" component="main" sx={{ flexGrow: 1 }}>
-          <Toolbar />
+          {/* Main Menu */}
+          <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+            {menu.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.path)}
+                  className={`w-full flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                    isActive(item.path)
+                      ? 'bg-indigo-50 text-indigo-600'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 mr-3" />
+                  {item.name}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Bottom Menu */}
+          <div className="px-4 py-4 border-t">
+            {bottomMenu.map((item) => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => navigate(item.path)}
+                  className={`w-full flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                    isActive(item.path)
+                      ? 'bg-indigo-50 text-indigo-600'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 mr-3" />
+                  {item.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className={`transition-all duration-200 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+        {/* Top Navigation */}
+        <header className="bg-white shadow">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                className="p-2 rounded-md text-gray-500 hover:text-gray-600 hover:bg-gray-100"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+              <div className="flex items-center space-x-4">
+                <button className="p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100">
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                    />
+                  </svg>
+                </button>
+                <div className="relative">
+                  <button className="flex items-center space-x-2 p-2 rounded-full text-gray-500 hover:text-gray-600 hover:bg-gray-100">
+                    <img
+                      className="w-8 h-8 rounded-full"
+                      src="https://via.placeholder.com/32"
+                      alt="User"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Content */}
+        <main className="p-6">
           <Routes>
-            <Route path="/" element={ <Dashboard />}></Route>
-            <Route path="/product/create" element={<CreateProductForm/>}></Route>
-            <Route path="/product/update/:productId" element={<UpdateProductForm/>}></Route>
-            <Route path="/products" element={<ProductsTable/>}></Route>
-            <Route path="/orders" element={<OrdersTable/>}></Route>
-            <Route path="/customers" element={<Customers/>}></Route>
-            <Route path="/demo" element={<DemoAdmin />}></Route>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/product/create" element={<CreateProductForm />} />
+            <Route path="/product/update/:productId" element={<UpdateProductForm />} />
+            <Route path="/products" element={<ProductsTable />} />
+            <Route path="/orders" element={<OrdersTable />} />
+            <Route path="/customers" element={<Customers />} />
           </Routes>
-         
-        </Box>
-      </Box>
-    </ThemeProvider>
+        </main>
+      </div>
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CartItem from "./CartItem";
-import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -34,55 +34,79 @@ const Cart = () => {
     fetchCart();
   }, []);
 
+  if (cartItems.length === 0) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h1>
+          <p className="text-gray-500 mb-8">Looks like you haven't added any items to your cart yet.</p>
+          <button
+            onClick={() => navigate("/products")}
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Continue Shopping
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="">
-      {cartItems.length > 0 && (
-        <div className="lg:grid grid-cols-3 lg:px-16 relative">
-          <div className="lg:col-span-2 lg:px-5 bg-white">
-            <div className="space-y-3">
-              {cartItems.map((item) => (
-                <CartItem key={item.id} item={item} showButton={true} />
-              ))}
-            </div>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <h1 className="text-2xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
+      
+      <div className="lg:grid grid-cols-3 gap-8">
+        {/* Cart Items */}
+        <div className="lg:col-span-2 space-y-4">
+          {cartItems.map((item) => (
+            <CartItem 
+              key={item.id} 
+              item={item} 
+              showButton={true} 
+              onCartUpdate={fetchCart}
+            />
+          ))}
+        </div>
 
-          <div className="px-5 sticky top-0 h-[100vh] mt-5 lg:mt-0">
-            <div className="border p-5 bg-white shadow-lg rounded-md">
-              <p className="font-bold opacity-60 pb-4">PRICE DETAILS</p>
-              <hr />
-
-              <div className="space-y-3 font-semibold">
-                <div className="flex justify-between pt-3 text-black">
-                  <span>Price ({cartSummary.totalItem} item)</span>
-                  <span>₹{cartSummary.totalPrice}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Discount</span>
-                  <span className="text-green-700">-₹{cartSummary.discounte}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Delivery Charges</span>
-                  <span className="text-green-700">Free</span>
-                </div>
-                <hr />
-                <div className="flex justify-between font-bold text-lg">
+        {/* Order Summary */}
+        <div className="lg:sticky lg:top-8 h-fit">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+            
+            <div className="space-y-4">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal ({cartSummary.totalItem} items)</span>
+                <span className="font-medium">₹{cartSummary.totalPrice}</span>
+              </div>
+              
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Discount</span>
+                <span className="text-green-600 font-medium">-₹{cartSummary.discounte}</span>
+              </div>
+              
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Delivery Charges</span>
+                <span className="text-green-600 font-medium">Free</span>
+              </div>
+              
+              <div className="border-t pt-4">
+                <div className="flex justify-between font-semibold text-lg">
                   <span>Total Amount</span>
-                  <span className="text-green-700">₹{cartSummary.totalDiscountedPrice}</span>
+                  <span className="text-green-600">₹{cartSummary.totalDiscountedPrice}</span>
                 </div>
               </div>
-
-              <Button
-                onClick={() => navigate("/checkout?step=2")}
-                variant="contained"
-                type="submit"
-                sx={{ padding: ".8rem 2rem", marginTop: "2rem", width: "100%" }}
-              >
-                Check Out
-              </Button>
             </div>
+
+            <button
+              onClick={() => navigate("/checkout?step=2")}
+              className="mt-6 w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Proceed to Checkout
+              <ArrowRightIcon className="ml-2 h-5 w-5" />
+            </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,104 +1,90 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Stepper from "@mui/material/Stepper";
-import Step from "@mui/material/Step";
-import StepLabel from "@mui/material/StepLabel";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import AddDeliveryAddressForm from "./AddAddress";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import AddDeliveryAddressForm from "./AddAddress";
 import OrderSummary from "./OrderSummary";
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const steps = [
-  "Login",
-  "Delivery Adress",
-  "Order Summary",
-  "Payment",
+  { id: 'login', name: 'Login' },
+  { id: 'address', name: 'Delivery Address' },
+  { id: 'summary', name: 'Order Summary' },
+  { id: 'payment', name: 'Payment' },
 ];
 
 export default function Checkout() {
-  const [activeStep, setActiveStep] = React.useState(1);
-  const [skipped, setSkipped] = React.useState(new Set());
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const step = queryParams.get('step');
-  const navigate=useNavigate();
- 
-console.log("step",step)
-
-
-  const handleNext = () => {
-    let newSkipped = skipped;
-   
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
-  };
+  const step = parseInt(queryParams.get('step') || '2');
+  const navigate = useNavigate();
 
   const handleBack = () => {
-    navigate(`/checkout?step=${step-1}`)
+    navigate(`/checkout?step=${step - 1}`);
   };
-
-
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const handlePayment=()=>{
-    console.log("handle payment")
-  }
 
   return (
-    <Box className="px-5 lg:px-32 " sx={{ width: "100%" }}>
-      <Stepper activeStep={step}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const labelProps = {};
-         
-          return (
-            <Step key={label} {...stepProps}>
-              <StepLabel {...labelProps}>{label}</StepLabel>
-            </Step>
-          );
-        })}
-      </Stepper>
-      {activeStep === steps.length ? (
-        <React.Fragment>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed - you&apos;re finished
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleReset}>Reset</Button>
-          </Box>
-        </React.Fragment>
-      ) : (
-        <React.Fragment>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={step == 2}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Back
-            </Button>
-            <Box sx={{ flex: "1 1 auto" }} />
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Stepper */}
+      <nav aria-label="Progress">
+        <ol role="list" className="flex items-center">
+          {steps.map((stepItem, index) => {
+            const isCurrent = index + 1 === step;
+            const isCompleted = index + 1 < step;
+            const isUpcoming = index + 1 > step;
 
-            
-          </Box>
-          {/* <Typography sx={{ my: 6 }}>Title</Typography> */}
+            return (
+              <li key={stepItem.id} className="relative">
+                {index !== steps.length - 1 && (
+                  <div
+                    className={`absolute top-4 left-4 -ml-px mt-0.5 h-0.5 w-8 ${
+                      isCompleted ? 'bg-indigo-600' : 'bg-gray-300'
+                    }`}
+                    aria-hidden="true"
+                  />
+                )}
+                <div className="group relative flex items-start">
+                  <span className="flex h-9 items-center">
+                    <span
+                      className={`relative z-10 flex h-8 w-8 items-center justify-center rounded-full ${
+                        isCompleted
+                          ? 'bg-indigo-600'
+                          : isCurrent
+                          ? 'border-2 border-indigo-600 bg-white'
+                          : 'border-2 border-gray-300 bg-white'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <span className="h-2.5 w-2.5 rounded-full bg-white" />
+                      ) : isCurrent ? (
+                        <span className="h-2.5 w-2.5 rounded-full bg-indigo-600" />
+                      ) : (
+                        <span className="h-2.5 w-2.5 rounded-full bg-transparent" />
+                      )}
+                    </span>
+                  </span>
+                  <span className="ml-4 flex min-w-0 flex-col">
+                    <span
+                      className={`text-sm font-medium ${
+                        isCurrent ? 'text-indigo-600' : 'text-gray-500'
+                      }`}
+                    >
+                      {stepItem.name}
+                    </span>
+                  </span>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
 
-          <div className="my-5">
-            {step == 2? <AddDeliveryAddressForm handleNext={handleNext} />:<OrderSummary/>}
-          </div>
-
-          {/* <AddDeliveryAddressForm handleNext={handleNext} /> */}
-
-          
-        </React.Fragment>
-      )}
-    </Box>
+      {/* Content */}
+      <div className="mt-8">
+        {step === 2 ? (
+          <AddDeliveryAddressForm handleNext={() => navigate("/checkout?step=3")} />
+        ) : (
+          <OrderSummary />
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,29 +1,18 @@
-import {
-  Grid,
-  TextField,
-  Button,
-  Snackbar,
-  Alert,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 export default function RegisterUserForm({ handleNext }) {
   const navigate = useNavigate();
-  const [openSnackBar, setOpenSnackBar] = useState(false);
-  const [snackBarMessage, setSnackBarMessage] = useState("");
-  const [snackBarSeverity, setSnackBarSeverity] = useState("success");
-
-  const handleClose = () => setOpenSnackBar(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    setIsLoading(true);
+    setError("");
 
+    const data = new FormData(event.currentTarget);
     const userData = {
       firstName: data.get("firstName"),
       lastName: data.get("lastName"),
@@ -44,112 +33,153 @@ export default function RegisterUserForm({ handleNext }) {
       if (response.ok) {
         localStorage.setItem("jwt", result.jwt);
         localStorage.setItem("user", JSON.stringify(result.user));
-        setSnackBarMessage("Registration Successful!");
-        setSnackBarSeverity("success");
-        setOpenSnackBar(true);
         navigate("/");
       } else {
         throw new Error(result.message || "Registration failed");
       }
     } catch (error) {
       console.error("Register error:", error);
-      setSnackBarMessage(error.message);
-      setSnackBarSeverity("error");
-      setOpenSnackBar(true);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              id="firstName"
-              name="firstName"
-              label="First Name"
-              fullWidth
-              autoComplete="given-name"
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              id="lastName"
-              name="lastName"
-              label="Last Name"
-              fullWidth
-              autoComplete="given-name"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              id="email"
-              name="email"
-              label="Email"
-              fullWidth
-              autoComplete="email"
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="role-label">Role</InputLabel>
-              <Select
-                labelId="role-label"
-                id="role"
-                name="role"
-                required
-                label="Role"
-              >
-                <MenuItem value={"ROLE_ADMIN"}>Admin</MenuItem>
-                <MenuItem value={"ROLE_CUSTOMER"}>Customer</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item xs={12}>
-            <TextField
-              required
-              id="password"
-              name="password"
-              label="Password"
-              fullWidth
-              type="password"
-              autoComplete="new-password"
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <Button
-              className="bg-[#9155FD] w-full"
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{ padding: ".8rem 0" }}
-            >
-              Register
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-
-      <div className="flex justify-center flex-col items-center">
-        <div className="py-3 flex items-center">
-          <p className="m-0 p-0">Already have an account?</p>
-          <Button onClick={() => navigate("/login")} className="ml-5" size="small">
-            Login
-          </Button>
-        </div>
+    <div className="w-full">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Create your account</h2>
+        <p className="mt-2 text-sm text-gray-600">
+          Join our community today
+        </p>
       </div>
 
-      <Snackbar open={openSnackBar} autoHideDuration={6000} onClose={handleClose}>
-        <Alert onClose={handleClose} severity={snackBarSeverity} sx={{ width: "100%" }}>
-          {snackBarMessage}
-        </Alert>
-      </Snackbar>
+      {error && (
+        <div className="mb-4 rounded-md bg-red-50 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <ExclamationCircleIcon className="h-5 w-5 text-red-400" aria-hidden="true" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+          <div>
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+              First name
+            </label>
+            <div className="mt-1">
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                autoComplete="given-name"
+                required
+                className="input"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+              Last name
+            </label>
+            <div className="mt-1">
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                autoComplete="family-name"
+                required
+                className="input"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Email address
+          </label>
+          <div className="mt-1">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              autoComplete="email"
+              required
+              className="input"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+            Role
+          </label>
+          <div className="mt-1">
+            <select
+              id="role"
+              name="role"
+              required
+              className="input"
+            >
+              <option value="">Select a role</option>
+              <option value="ROLE_ADMIN">Admin</option>
+              <option value="ROLE_CUSTOMER">Customer</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <div className="mt-1">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              autoComplete="new-password"
+              required
+              className="input"
+            />
+          </div>
+        </div>
+
+        <div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="btn-primary w-full flex justify-center"
+          >
+            {isLoading ? (
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : null}
+            {isLoading ? "Creating account..." : "Create account"}
+          </button>
+        </div>
+      </form>
+
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-600">
+          Already have an account?{" "}
+          <button
+            onClick={() => navigate("/login")}
+            className="font-medium text-primary-600 hover:text-primary-500"
+          >
+            Sign in
+          </button>
+        </p>
+      </div>
     </div>
   );
 }

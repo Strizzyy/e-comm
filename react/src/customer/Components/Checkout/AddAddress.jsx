@@ -1,33 +1,57 @@
-import * as React from "react";
-import {
-  Grid,
-  TextField,
-  Button,
-  Box,
-} from "@mui/material";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import AddressCard from "../adreess/AdreessCard";
+import { CheckIcon } from '@heroicons/react/24/outline';
 
 export default function AddDeliveryAddressForm({ handleNext }) {
   const navigate = useNavigate();
   const jwt = localStorage.getItem("jwt");
   const user = JSON.parse(localStorage.getItem("user"));
   const [selectedAddress, setSelectedAddress] = useState(null);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    streetAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    mobile: '',
+  });
+  const [errors, setErrors] = useState({});
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user types
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
 
-    const address = {
-      firstName: data.get("firstName"),
-      lastName: data.get("lastName"),
-      streetAddress: data.get("address"),
-      city: data.get("city"),
-      state: data.get("state"),
-      zipCode: data.get("zip"),
-      mobile: data.get("phoneNumber"),
-    };
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.firstName) newErrors.firstName = 'First name is required';
+    if (!formData.lastName) newErrors.lastName = 'Last name is required';
+    if (!formData.streetAddress) newErrors.streetAddress = 'Address is required';
+    if (!formData.city) newErrors.city = 'City is required';
+    if (!formData.state) newErrors.state = 'State is required';
+    if (!formData.zipCode) newErrors.zipCode = 'ZIP code is required';
+    if (!formData.mobile) newErrors.mobile = 'Phone number is required';
+    else if (!/^\d{10}$/.test(formData.mobile)) newErrors.mobile = 'Invalid phone number';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
 
     try {
       const res = await fetch("http://localhost:8080/api/orders", {
@@ -36,15 +60,12 @@ export default function AddDeliveryAddressForm({ handleNext }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${jwt}`,
         },
-        body: JSON.stringify(address),
+        body: JSON.stringify(formData),
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to place order");
-      }
+      if (!res.ok) throw new Error("Failed to place order");
 
       const result = await res.json();
-      console.log("Order placed:", result);
       handleNext();
       navigate("/checkout?step=3");
     } catch (error) {
@@ -67,7 +88,6 @@ export default function AddDeliveryAddressForm({ handleNext }) {
       if (!res.ok) throw new Error("Order failed");
 
       const result = await res.json();
-      console.log("Order placed with saved address:", result);
       handleNext();
       navigate("/checkout?step=3");
     } catch (error) {
@@ -77,104 +97,188 @@ export default function AddDeliveryAddressForm({ handleNext }) {
   };
 
   return (
-    <Grid container spacing={4}>
-      <Grid item xs={12} lg={5}>
-        <Box className="border rounded-md shadow-md h-[30.5rem] overflow-y-scroll">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {/* Saved Addresses */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900">Saved Addresses</h2>
+        <div className="space-y-4 max-h-[600px] overflow-y-auto">
           {user?.addresses?.map((item) => (
             <div
               key={item.id}
+              className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                selectedAddress?.id === item.id
+                  ? 'border-indigo-600 bg-indigo-50'
+                  : 'border-gray-200 hover:border-indigo-300'
+              }`}
               onClick={() => setSelectedAddress(item)}
-              className="p-5 py-7 border-b cursor-pointer"
             >
               <AddressCard address={item} />
               {selectedAddress?.id === item.id && (
-                <Button
-                  sx={{ mt: 2 }}
-                  size="large"
-                  variant="contained"
-                  color="primary"
+                <button
                   onClick={() => handleCreateOrder(item)}
+                  className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   Deliver Here
-                </Button>
+                  <CheckIcon className="ml-2 h-4 w-4" />
+                </button>
               )}
             </div>
           ))}
-        </Box>
-      </Grid>
+        </div>
+      </div>
 
-      <Grid item xs={12} lg={7}>
-        <Box className="border rounded-md shadow-md p-5">
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  id="firstName"
-                  name="firstName"
-                  label="First Name"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  id="lastName"
-                  name="lastName"
-                  label="Last Name"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  id="address"
-                  name="address"
-                  label="Address"
-                  fullWidth
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField required id="city" name="city" label="City" fullWidth />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField required id="state" name="state" label="State" fullWidth />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  id="zip"
-                  name="zip"
-                  label="Zip / Postal code"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  required
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  label="Phone Number"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button
-                  sx={{ padding: ".9rem 1.5rem" }}
-                  size="large"
-                  type="submit"
-                  variant="contained"
-                  color="primary"
-                >
-                  Deliver Here
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Box>
-      </Grid>
-    </Grid>
+      {/* New Address Form */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-gray-900">Add New Address</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">
+                First Name
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  errors.firstName ? 'border-red-300' : ''
+                }`}
+              />
+              {errors.firstName && (
+                <p className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  errors.lastName ? 'border-red-300' : ''
+                }`}
+              />
+              {errors.lastName && (
+                <p className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="streetAddress" className="block text-sm font-medium text-gray-700">
+              Street Address
+            </label>
+            <textarea
+              id="streetAddress"
+              name="streetAddress"
+              rows={3}
+              value={formData.streetAddress}
+              onChange={handleChange}
+              className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                errors.streetAddress ? 'border-red-300' : ''
+              }`}
+            />
+            {errors.streetAddress && (
+              <p className="mt-1 text-sm text-red-600">{errors.streetAddress}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                City
+              </label>
+              <input
+                type="text"
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  errors.city ? 'border-red-300' : ''
+                }`}
+              />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-600">{errors.city}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                State
+              </label>
+              <input
+                type="text"
+                id="state"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  errors.state ? 'border-red-300' : ''
+                }`}
+              />
+              {errors.state && (
+                <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                ZIP Code
+              </label>
+              <input
+                type="text"
+                id="zipCode"
+                name="zipCode"
+                value={formData.zipCode}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  errors.zipCode ? 'border-red-300' : ''
+                }`}
+              />
+              {errors.zipCode && (
+                <p className="mt-1 text-sm text-red-600">{errors.zipCode}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                id="mobile"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm ${
+                  errors.mobile ? 'border-red-300' : ''
+                }`}
+              />
+              {errors.mobile && (
+                <p className="mt-1 text-sm text-red-600">{errors.mobile}</p>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Deliver Here
+            <CheckIcon className="ml-2 h-4 w-4" />
+          </button>
+        </form>
+      </div>
+    </div>
   );
 }

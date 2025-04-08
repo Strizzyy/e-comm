@@ -15,8 +15,8 @@ code {
     monospace;
 }
 
-
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import './Styles/global.css';
