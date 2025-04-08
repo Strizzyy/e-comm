@@ -1,102 +1,88 @@
-# E-Commerce Full Stack Project
+# E-Commerce Website
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+A full-stack e-commerce website built with React and Spring Boot.
 
 ## Description
 
-I have made this project with Angular + Spring Boot, React + Spring Boot, React + Nodejs
-
-A full-stack eCommerce application built with React and Spring Boot And Node Js. The project aims to provide users with a seamless online shopping experience, featuring a responsive and user-friendly interface, a wide range of products, and secure payment options.
-
-## Client
-###### Angular : https://github.com/developer207/ecommerce-angular
-
-## Server
-###### spring boot: https://github.com/ashok0001/e-commerce-server
-###### node js: https://github.com/ashok0001/ecommerce-node
-
-## Table of Contents
-
-- [Features](#features)
-- [Demo](#demo)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
-- [Screenshots](#screenshots)
-
-## Features
-
-- User registration and authentication.
-- Browse through a variety of products in different categories.
-- Add products to the cart and manage cart items.
-- Checkout process with various payment options.
-- Order history and tracking.
-- Admin panel to manage products, categories, and orders.
-
-## Demo
-
-[shopwithzosh](https://shopwithzosh.vercel.app/)
+This is a modern e-commerce platform that provides a seamless shopping experience with features like product browsing, cart management, user authentication, and order processing.
 
 ## Technologies Used
 
-- Frontend:
-  - React: JavaScript library for building user interfaces.
-  - Redux: State management library for React applications.
-  - HTML/CSS: Markup and styling of the application.
-  - Axios: HTTP client for making API requests.
-  - MUI: CSS components library.
-  - Tailwind Css.
+### Frontend
+- React
+- Redux
+- Material-UI
+- Tailwind CSS
+- Axios
+- React Router Dom
 
-- Backend:
-  - Spring Boot: Java framework for building robust and scalable backend applications.
-  - Spring Security: Authentication and authorization for the API endpoints.
-  - Spring Data JPA: Database access and ORM tool.
-  - MySQL : Database to store application data.
+### Backend
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- MySQL
+- JWT Authentication
+- Maven
+
+## Features
+
+- User authentication and authorization
+- Product catalog with categories
+- Shopping cart functionality
+- Order processing and tracking
+- Responsive design for all devices
+- Admin dashboard for product management
+- Secure payment processing
+- User profile management
 
 ## Installation
 
-1. Clone Frontend repository: `git clone https://github.com/ashok0001/e-commerce-server.git`
-2. Clone Backend Repository: `git clone https://github.com/ashok0001/e-commerce-server.git`
-3. Change directory Frontend:`cd shopwithzosh`
-4. Change directory Backend: `cd e-commerce-server`
-5. Install frontend dependencies: `npm install`
-6. Install backend dependencies
+1. Clone the repository
+```bash
+git clone <repository-url>
+```
+
+2. Install frontend dependencies
+```bash
+cd react
+npm install
+```
+
+3. Install backend dependencies
+```bash
+cd ../spring-boot
+mvn install
+```
+
+4. Configure environment variables
+- Create a `.env` file in the frontend directory
+- Set up database configurations in `application.properties`
+
+5. Run the application
+```bash
+# Start frontend
+npm start
+
+# Start backend
+mvn spring-boot:run
+```
 
 ## Usage
 
-1. Start the frontend application: `npm start`
-2. Start the backend server:
-3. Access the application at `http://localhost:3000` in your web browser.
+- Visit `http://localhost:3000` to access the website
+- Use the navigation menu to browse products
+- Sign up/Login to access user features
+- Add items to cart and proceed to checkout
+- Admin users can access the dashboard for management
 
-## API Endpoints
+## Contact
 
-List the available API endpoints along with their descriptions and the necessary request and response formats.
-
-Example:
-
-[Checkout All Endpoints Here...](https://e-commerce-server-production-0873.up.railway.app/swagger-ui/index.html)
-
-## Contributing
-
-Contributions are welcome! If you find any bugs or want to add new features, please submit an issue or create a pull request.
+Rohan Singh  
+Email: rohansinghxyzz@gmail.com
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-If you have any questions or suggestions, feel free to contact me:
-
-- Ashok Zarmariya
-- ashokzarmariya47@gmail.com
-- [Linkedin](https://www.linkedin.com/in/ashok-zarmariya-473aa722a/)
-
-Feel free to customize the README to include more specific information about your project. Good luck with your eCommerce full-stack application!
 
 ## ScreenShots
 
