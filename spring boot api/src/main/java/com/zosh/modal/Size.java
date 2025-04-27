@@ -19,5 +19,12 @@ public class Size {
 		this.quantity = quantity;
 	}
 	
-	
+	public Size() {
+		// Default constructor
+	}
+
+	public Size(String name, int quantity) {
+		this.name = name;
+		this.quantity = quantity;
+	}
 }

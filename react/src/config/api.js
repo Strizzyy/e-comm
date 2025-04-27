@@ -9,9 +9,19 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-const token = localStorage.getItem('jwt');
-
-api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+// Add a request interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('jwt');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 api.defaults.headers.post['Content-Type'] = 'application/json';
 

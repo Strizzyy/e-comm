@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -18,6 +18,7 @@ import { Backdrop, CircularProgress } from "@mui/material";
 
 import { filters, singleFilter, sortOptions } from "./FilterData";
 import ProductCard from "../ProductCard/ProductCard";
+import api from "../../../../config/api"; // Import the api instance
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -90,8 +91,6 @@ export default function Product() {
 
       const queryParams = new URLSearchParams({
         category: param.lavelThree || "",
-        colors: colorValue || "",
-        sizes: sizeValue || "",
         minPrice: minPrice || 0,
         maxPrice: maxPrice || 10000,
         minDiscount: disccount || 0,
@@ -102,8 +101,9 @@ export default function Product() {
       });
 
       try {
-        const res = await fetch(`http://localhost:8080/api/products?${queryParams}`);
-        const data = await res.json();
+        // Use the imported api instance instead of fetch
+        const res = await api.get(`/api/products?${queryParams}`);
+        const data = res.data; // Axios puts the response body in .data
         setProducts(data.content || []);
         setTotalPages(data.totalPages || 1);
       } catch (err) {
@@ -143,7 +143,7 @@ export default function Product() {
                 </Menu.Button>
               </div>
               <Transition
-                as={Fragment}
+                as={React.Fragment}
                 enter="transition ease-out duration-100"
                 enterFrom="transform opacity-0 scale-95"
                 enterTo="transform opacity-100 scale-100"

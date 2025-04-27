@@ -24,7 +24,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	
 	@Query("SELECT p FROM Product p " +
-	        "WHERE (p.category.name = :category OR :category = '') " +
+	        "WHERE (LOWER(p.category.name) = LOWER(:category) OR :category = '') " +
 	        "AND ((:minPrice IS NULL AND :maxPrice IS NULL) OR (p.discountedPrice BETWEEN :minPrice AND :maxPrice)) " +
 		    "AND (:minDiscount IS NULL OR p.discountPersent >= :minDiscount) " +
 		    "ORDER BY " +
@@ -38,6 +38,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 			@Param("minDiscount") Integer minDiscount,
 			@Param("sort") String sort
 			);
+
+	// Add logging for filter parameters
+	default List<Product> filterProductsWithLogging(String category, Integer minPrice, Integer maxPrice, Integer minDiscount, String sort) {
+		System.out.println("Filtering products with parameters:");
+		System.out.println("Category: " + category);
+		System.out.println("Min Price: " + minPrice);
+		System.out.println("Max Price: " + maxPrice);
+		System.out.println("Min Discount: " + minDiscount);
+		System.out.println("Sort: " + sort);
+		return filterProducts(category, minPrice, maxPrice, minDiscount, sort);
+	}
 	
 	public List<Product> findTop10ByOrderByCreatedAtDesc();
 }
