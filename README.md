@@ -38,10 +38,7 @@ This project is a modern e-commerce platform designed to provide a seamless onli
 
 ## API Documentation
 
-The backend provides a RESTful API. Detailed API documentation is available via Swagger UI.
-
-- **Base URL**: [Api Link](https://e-commerce-server-production-0873.up.railway.app)
-- **API Docs (Swagger UI)**: [Api Docs Link](https://e-commerce-server-production-0873.up.railway.app/swagger-ui/index.html)
+The backend provides a RESTful API.
 
 Authentication: All protected endpoints require a valid JWT in the `Authorization` header (`Bearer <token>`).
 
