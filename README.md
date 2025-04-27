@@ -122,7 +122,3 @@ To set up and run the project locally, follow these steps:
 
 -   **Rohan Singh**: rohansinghxyzz@gmail.com (Frontend/Overall Project)
 -   **Rohan Singh**: rohansinghxyzz@gmail.com (Backend API)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
