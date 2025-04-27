@@ -117,11 +117,6 @@ To set up and run the project locally, follow these steps:
 ├── .git/              # Git version control
 └── README.md          # This file
 ```
-*(Note: This is a simplified structure. A full file tree can be generated if needed.)*
-
-## Contributing
-
-(Add contributing guidelines if applicable)
 
 ## Contact
 
